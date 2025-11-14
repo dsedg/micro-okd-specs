@@ -9,11 +9,11 @@
 %global golang_version 1.19
 
 %global version_major 4
-%global version_minor 18
+%global version_minor 20
 %global version_patch 0
 
 %{!?commit:
-%global commit c64c430e48013ced1705344bb95ba1bdfb2a1a0b
+%global commit 0808e14637d72c01a3cb50e41617576836e84524
 }
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
@@ -42,7 +42,7 @@ Source0:        https://%{import_path}/archive/%{commit}/oc-%{commit}.tar.gz
 %if 0%{?go_arches:1}
 ExclusiveArch:  %{go_arches}
 %else
-ExclusiveArch:  x86_64 aarch64 ppc64le s390x
+ExclusiveArch:  x86_64 aarch64
 %endif
 
 BuildRequires:  golang >= %{golang_version}
@@ -77,29 +77,15 @@ export GOPATH=$(pwd)/__gopath:%{gopath}
 cd "__gopath/src/%{import_path}"
 %endif
 
-%ifarch %{ix86}
-GOOS=linux
-GOARCH=386
-%endif
-%ifarch ppc64le
-GOOS=linux
-GOARCH=ppc64le
-%endif
+
 %ifarch %{arm} aarch64
 GOOS=linux
 GOARCH=arm64
 %endif
-%ifarch s390x
-GOOS=linux
-GOARCH=s390x
-%endif
+
 
 %{make} build GO_BUILD_PACKAGES:='./cmd/oc ./tools/genman'
 
-#%ifarch x86_64
-#  # Create Binaries for all supported arches
-#  %{make} cross-build-darwin-amd64 cross-build-windows-amd64 GO_BUILD_PACKAGES:='./cmd/oc'
-#%endif
 
 %install
 install -d %{buildroot}%{_bindir}
@@ -133,6 +119,10 @@ done
 
 
 %changelog
+* Sat Nov 15 2025 dsedg
+- Bump release to 4.20
+- Removed ppc64le s390x and 386 archs
+
 * Wed Jan 01 2025 SupremeMortal 4.18.0-7.gitc64c430
 - Remove redistributable package
   (6178101+SupremeMortal@users.noreply.github.com)
